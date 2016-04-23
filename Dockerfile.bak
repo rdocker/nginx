@@ -1,0 +1,46 @@
+FROM centos:6.7
+MAINTAINER ronnie <comdeng@live.com>
+
+ENV TZ "Asia/Shanghai"
+
+RUN curl http://mirrors.aliyun.com/repo/Centos-6.repo -o /etc/yum.repos.d/CentOS-Base.repo &&\
+    curl http://tengine.taobao.org/download/tengine-2.1.2.tar.gz -L -o /root/tengine-2.1.2.tar.gz &&\
+    yum -y install tar&&\
+    cd /root/ && tar xvfz tengine-2.1.2.tar.gz 
+RUN curl -L https://github.com/kali/nginx-operationid/archive/master.zip -o /root/nginx.operationid.zip
+RUN cd /root && yum -y install unzip && unzip nginx.operationid.zip 
+RUN curl -L https://github.com/openresty/echo-nginx-module/archive/master.zip -o /root/echo-nginx-module.zip
+RUN cd /root && unzip echo-nginx-module.zip
+
+RUN yum -y install gcc
+RUN yum -y install pcre-devel
+RUN yum -y install openssl-devel
+RUN cd /root/tengine-2.1.2 &&\
+    mkdir /data/ &&\
+    ./configure \
+        --prefix=/usr/local/nginx \
+        --add-module=../echo-nginx-module-master/ \
+        --with-http_realip_module \
+        --add-module=../nginx-operationid-master/ \
+        --conf-path=/data/conf \
+        --error-log-path=/data/log/error.log \
+        --http-log-path=/data/log/access.log \
+        --pid-path=/data/run/nginx.pid \
+        --lock-path=/data/run/nginx.lock \
+        --http-client-body-temp-path=/data/proxy_temp \
+        --http-fastcgi-temp-path=/data/fastcgi_temp \
+        --http-uwsgi-temp-path=/data/uwsgi_temp \
+        --http-scgi-temp-path=/data/scgi_temp \
+        --user=nginx \
+        --group=nginx \
+        --with-http_ssl_module \
+        --with-http_flv_module \
+        --with-http_mp4_module \
+        --with-http_stub_status_module \
+        --with-http_v2_module &&\
+    make install
+
+#VOLUME ["/data/"]
+
+EXPOSE 80
+ENTRYPOINT ["/usr/local/nginx/sbin/nginx", "-g", "daemon off;"]
