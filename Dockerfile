@@ -17,7 +17,7 @@ RUN curl http://mirrors.aliyun.com/repo/Centos-6.repo -o /etc/yum.repos.d/CentOS
     mkdir /data/ &&\
     useradd nginx -M -s /bin/nologin -g nginx &&\
     ./configure \
-    --prefix=/usr/local/nginx \
+    --prefix=/opt/nginx \
     --add-module=../echo-nginx-module-master/ \
     --with-http_realip_module \
     --add-module=../nginx-operationid-master/ \
@@ -34,11 +34,11 @@ RUN curl http://mirrors.aliyun.com/repo/Centos-6.repo -o /etc/yum.repos.d/CentOS
     rm -rf /root/echo-nginx-module* &&\
     yum -y erase tar unzip gcc pcre-devel openssl-devel &&\
     yum clean all &&\
-    mkdir /usr/local/nginx/conf/vhost
+    mkdir /opt/nginx/conf/vhost
 
 
-COPY nginx.conf /usr/local/nginx/conf/nginx.conf
-COPY default.conf /usr/local/nginx/conf/vhost/default.conf
+COPY nginx.conf /opt/nginx/conf/nginx.conf
+COPY default.conf /opt/nginx/conf/vhost/default.conf
 
 EXPOSE 80
-ENTRYPOINT ["/usr/local/nginx/sbin/nginx", "-g", "daemon off;"]
+ENTRYPOINT ["/opt/nginx/sbin/nginx", "-g", "daemon off;"]
