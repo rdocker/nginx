@@ -37,8 +37,11 @@ RUN curl http://mirrors.aliyun.com/repo/Centos-6.repo -o /etc/yum.repos.d/CentOS
     mkdir /opt/nginx/conf/vhost
 
 
-COPY nginx.conf /opt/nginx/conf/nginx.conf
-COPY default.conf /opt/nginx/conf/vhost/default.conf
+ADD nginx.conf /opt/nginx/conf/nginx.conf
+ADD default.conf /opt/nginx/conf/vhost/default.conf
+
+#VOLUME /opt/nginx/conf/vhost
+#VOLUME /data/sites/
 
 EXPOSE 80
 ENTRYPOINT ["/opt/nginx/sbin/nginx", "-g", "daemon off;"]
